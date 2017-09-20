@@ -1,0 +1,185 @@
+---
+title: "8 - Analysis"
+author: "Melanie Ang"
+date: "September 14, 2017"
+output: html_document
+---
+
+## Find 20 year rolling average for catch
+
+```{r Load packages}
+library(zoo) #function rollMeans
+```
+
+
+# Nested loop methods
+** which does not work because too inefficient**
+```{r This is my for loop}
+
+# just one
+# sau_dbem[,2:21]
+# 
+# for (t in 1:117){
+#   
+#   n <- as.character(Mexicotaxa$Mexicotaxa[t])
+#   
+#   filepath <- paste("C:/Users/angmel/Documents/firstchapter/SAU_DBEM_RESULTS/Mexico/GFDL26/", n, ".csv", sep = "")
+#   sau_dbem <- read.csv(filepath, header = TRUE)
+# 
+#   sau_dbem[is.na(sau_dbem)] <- 0
+#   
+#   # average 10 years
+#   
+#   avg_sau_dbem <- data.frame(t(array(1:52)))
+#   colnames(avg_sau_dbem) <- c("INDEX", 2000:2050)
+#   
+#   for (j in 1:length(sau_dbem[,1])){
+#     
+#     a <- 52 * length(sau_dbem[,1])
+#     avg_sau_dbem <- data.frame(matrix(seq(1:a), ncol = 52))
+#     avg_sau_dbem$X1 <- sau_dbem$INDEX
+#     colnames(avg_sau_dbem) <- c("INDEX", 2000:2050)
+#     
+#     for (i in 2:52) {
+#       x <- i
+#       y <- i + 19
+#       avg_sau_dbem[j,i] <- rowMeans(sau_dbem[j,x:y])
+#     }}
+#       
+#     
+#   avg_sau_dbem$INDEX <- sau_dbem$INDEX
+#   
+#   newfilepath <- paste(filepath, "_avg", ".csv",sep = "")
+#   
+#   write.csv(avg_sau_dbem,newfilepath)
+#   
+#   }
+# 
+
+```
+
+# RollMeans method
+** Within zoo package, this calculates 20 year averages for 1 data frame **
+
+```{r Rollmeans for 1 data frame}
+
+ # prep upload data frame
+sau_dbem <- read.csv("C:/Users/angmel/Documents/firstchapter/SAU_DBEM_RESULTS/USA/GFDL85/603590.csv")
+
+# remove rows with duplicated cell IDs -  error from 7final.R
+sau_dbem <- sau_dbem[!duplicated(sau_dbem$INDEX),]
+
+# prepare data frame for analysis
+flip_sau_dbem <- data.frame(t(sau_dbem))
+
+# average every 20 years
+smoothMean <- rollmean(x = flip_sau_dbem, # original series 
+                       k = 20) # width of the rolling window 
+
+# tidying data
+colnames(smoothMean) <- flip_sau_dbem[1,]
+smoothMean <- smoothMean[-1,]
+rownames(smoothMean) <- c(2000:2051)
+# rownames(avg_sau_dbem) <- flip_sau_dbem[1,]
+
+# final result
+# avg_sau_dbem 
+```
+
+# Apply rollmeans method in a for loop
+
+```{r Upload taxa ID information}
+
+Mexico_DROBO <- read.csv("C:/Users/angmel/Documents/firstchapter/SAU x DBEM/taxaID/Mexico_DROBO.csv", header = FALSE)
+Mexico_cygwin <- read.csv("C:/Users/angmel/Documents/firstchapter/SAU x DBEM/taxaID/Mexico_cygwin.csv", header = FALSE)
+Mexicotaxa <- rbind(Mexico_cygwin, Mexico_DROBO)
+```
+
+
+```{r Rollmeans applied to multiple data frames}
+
+# create a for loop based on number of files in folder
+for (t in 1:11){
+  
+  n <- as.character(Mexicotaxa$Mexicotaxa[t])
+
+  # upload data  
+  filepath <- paste("C:/Users/angmel/Documents/firstchapter/SAU_DBEM_RESULTS/Mexico/GFDL26/", n, ".csv", sep = "")
+  sau_dbem <- read.csv(filepath, header = TRUE)
+
+  # remove rows with duplicated cell IDs -  error from 7final.R
+  sau_dbem <- sau_dbem[!duplicated(sau_dbem$INDEX),]
+
+  # prepare data frame for analysis
+  flip_sau_dbem <- tFrame(sau_dbem)
+
+  # average every 20 years
+  smoothMean <- rollmean(x = flip_sau_dbem, # original series 
+                         k = 20)              # width of the rolling window 
+
+  # tidying data
+  colnames(smoothMean) <- flip_sau_dbem[1,]   # add cell ID
+  smoothMean <- smoothMean[-1,]               # remove row 1 (average of cell IDs)
+  rownames(smoothMean) <- c(2000:2051)        # add years as row names
+
+  # transpose again to standard format
+  avg_sau_dbem <- data.frame(t(smoothMean))
+  
+  # final result
+  avg_sau_dbem 
+  
+  newfilepath <- paste("C:/Users/angmel/Documents/firstchapter/SAU_DBEM_RESULTS/Mexico/GFDL26/", n, "_avg.csv", sep = "")
+  
+  write.csv(avg_sau_dbem, newfilepath)
+}
+```
+
+
+```{r Rollmeans applied to multiple data frames}
+
+# create a for loop based on number of files in folder
+for(i in 1:length(Canada_taxa$taxon.taxaID)){
+  
+  taxontemp<-as.character(Canada_taxa$taxon.taxaID[i])
+  taxontemp<-substr(taxontemp,nchar(taxontemp)-5,nchar(taxontemp))
+
+  # n <- as.character(Mexicotaxa$Mexicotaxa[t])
+
+  # upload data  
+  filepath <- paste("C:/Users/angmel/Documents/firstchapter/SAU_DBEM_RESULTS/Canada/GFDL26/", taxontemp, ".csv", sep = "")
+  sau_dbem <- read.csv(filepath, header = TRUE)
+
+  # remove rows with duplicated cell IDs -  error from 7final.R
+  sau_dbem <- sau_dbem[!duplicated(sau_dbem$INDEX),]
+
+  # prepare data frame for analysis
+  flip_sau_dbem <- tFrame(sau_dbem)
+
+  # average every 20 years
+  smoothMean <- rollmean(x = flip_sau_dbem, # original series 
+                         k = 20)              # width of the rolling window 
+
+  # tidying data
+  colnames(smoothMean) <- flip_sau_dbem[1,]   # add cell ID
+  smoothMean <- smoothMean[-1,]               # remove row 1 (average of cell IDs)
+  rownames(smoothMean) <- c(2000:2051)        # add years as row names
+
+  # transpose again to standard format
+  avg_sau_dbem <- data.frame(t(smoothMean))
+  
+  # final result
+  avg_sau_dbem 
+  
+  newfilepath <- paste("C:/Users/angmel/Documents/firstchapter/SAU_DBEM_RESULTS/Canada/GFDL26/", taxontemp, "_avg.csv", sep = "")
+  
+  write.csv(avg_sau_dbem, newfilepath)
+}
+```
+
+## Vicky's code
+
+```{r}
+
+```
+
+
