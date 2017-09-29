@@ -1,59 +1,33 @@
-# Let's examine error log
+# Error log analysis
+library(tidyverse)
 
-# What's in here?
-# Taxa where DBEM says there is no record of their occurrences in the proposed EEZ
-# BUT SAU catch says its being caught!
-# This could be because of the way I split the MMF etc. "G" species?
-
-# set wd
 setwd("~/firstchapter/R codes/MSc-small-scale-fisheries/DBEM x SAU/errorlog")
+error_report <- read.csv("error_report.csv")
 
-# ALASKA read file and combine error logs
-# ALASKA: 6 error out of 52 species
-ALASKA26D <- read.csv("ALASKA26DROBO") %>% 
-  na.omit()
-ALASKA85D <- read.csv("ALASKA85DROBO") %>% 
-  na.omit()
-ALASKA_error <- full_join(ALASKA26D, ALASKA85D)
-ALASKA_error$eez <- "Alaska"
+# Cases of error:
+# 1. Inverts - have not modelled yet
+# 2. My potential error in spliting G species
+# 3. Check inputs! Either D or B species, or G but with comm importance and in range
 
+# LEVEL 1 SPECIES: exclude these from the list (for now)
+inverts <- c("690088", "690206", "690053", "690088", "690440", "690009", "690053", "690440")
 
-# CANADA HAS NO ERROR
+# LEVEL 3 species, lets plot DBEM data to see where species is located
 
-# USA WEST
-# 9 out of 73
-USA26D <- read.csv("USA26DROBO") %>% 
-  na.omit()
-USA85D <- read.csv("USA85DROBO") %>% 
-  na.omit()
-USA26C <- read.csv("USA26CYGWIN") %>% 
-  na.omit()
-USA85C <- read.csv("USA85CYGWIN") %>% 
-  na.omit()
-USA_error <- full_join(USA26D, USA85D) %>% 
-  full_join(USA26C) %>% 
-  full_join(USA85C)
-USA_error$eez <- "USA"
+# 600751, great white shark
+# run dbem_import function
 
+# upload csv file
+sppdist <- dbem_Import(600751, 1991,2060,2.6,"Catch")
 
-# MEXICO
-# 15 out of 56
-MEXICO26D <- read.csv("MEXICO26DROBO") %>% 
-  na.omit()
-MEXICO85D <- read.csv("MEXICO85DROBO") %>% 
-  na.omit()
-MEXICO26C <- read.csv("MEXICO26CYGWIN") %>% 
-  na.omit()
-MEXICO85C <- read.csv("MEXICO85CYGWIN") %>% 
-  na.omit()
-Mexico_error <- full_join(MEXICO26D, MEXICO85D) %>% 
-  full_join(MEXICO26C) %>% 
-  full_join(MEXICO85C)
-Mexico_error$eez <- "Mexico"
+lat_lon <- read.csv("C:/Users/angmel/Documents/firstchapter/Reference tables/Lat_Lon.csv", header = FALSE) %>% 
+  rename("INDEX" = V1, "lon" = V2, "lat" = V3)
 
+mapthis <- dplyr::select(sppdist, INDEX, X1991)
+mapthis2 <- inner_join(mapthis, lat_lon, by = "INDEX")
+mapthis2$INDEX <- NULL
+mapthis2 <- mapthis2[,c(2,3,1)]
 
-# lets see all the errors together
-error_report <- bind_rows(ALASKA_error, USA_error) %>% 
-  bind_rows(Mexico_error)
-error_report$X <- NULL
-write.csv(error_report, "error_report.csv")
+xyz <- rasterFromXYZ(mapthis2)
+plot(xyz)
+?rasterFromXYZ
