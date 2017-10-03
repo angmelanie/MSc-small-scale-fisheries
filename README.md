@@ -8,3 +8,5 @@ For now, let's jump to Step 7 in my analysis:
 | Step | Purpose | Link |
 |:------:|:-----:|:---------:|
 | 7 | Integrate DBEM future distribution with SAU catch | [Click here](https://github.com/angmelanie/small-scale-fisheries/tree/master/DBEM%20x%20SAU) |
+| 8 | There's an error file where DBEM and SAU do not integrate | --|
+| 9 | I ignore (for now) the error file, and proceed to average the catch over a 20 year period so that 1990-2060 becomes 2000-2050 to account for inetrannual variability | -- |
