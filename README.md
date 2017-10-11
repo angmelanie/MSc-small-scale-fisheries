@@ -9,4 +9,6 @@ For now, let's jump to Step 7 in my analysis:
 |:------:|:-----:|:---------:|
 | 7 | Integrate DBEM future distribution with SAU catch | [Click here](https://github.com/angmelanie/small-scale-fisheries/tree/master/DBEM%20x%20SAU) |
 | 8 | There's an error file where DBEM and SAU do not integrate | --|
-| 9 | I ignore (for now) the error file, and proceed to average the catch over a 20 year period so that 1990-2060 becomes 2000-2050 to account for inetrannual variability | -- |
+| 9 | I ignore (for now) the error file, and proceed to average the catch over a 20 year period so that 1990-2060 becomes 2000-2050 to account for inetrannual variability | [Click here](https://github.com/angmelanie/small-scale-fisheries/blob/master/averging%20years.R) |
+| 10 | Compare projected catches between EEZ for RCP8.5 and 2.6 | [Click here](https://github.com/angmelanie/small-scale-fisheries/blob/master/catch-by-eez.R) |
+| 11 | Compare projected catches between pelagic, demersal | [Click here](https://github.com/angmelanie/small-scale-fisheries/blob/master/catch-by-DemersPelag.R) |
