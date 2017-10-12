@@ -1,0 +1,31 @@
+,x,eez,Commonname,Sciname,Issue,Other notes
+1,600247,Alaska,Arctic char,Salvelinus alpinus alpinus,"Arctic char distribution is in FAO18, but subarctic alaska is FAO67",B and G species
+2,600309,Alaska,Greenland cod,Gadus ogac,Ooops greenland cod does not occur is FAO 67; may need to relabel as Pacific cod,G
+3,600751,Alaska,Great white shark,Carcharodon carcharias,"Distribution maps seem to cut off in Canada waters, does not go into Alaska. But lat max is 66N (which includes Alaska) Says minor commercial",G
+4,604252,Alaska,Curlfin sole,Pleuronichthys decurrens,Not sure whats wrong because range maps goes from Mexico to Alaska… need to check your actual maps and input info,G
+5,690088,Alaska,,,,
+6,690206,Alaska,,,,
+7,600006,USA,,,,
+8,600098,USA,,,,
+9,600136,USA,,,,
+10,600382,USA,,,,
+11,602540,USA,,,,
+12,690053,USA,,,,
+13,690088,USA,,,,
+14,690440,USA,,,,
+15,800012,USA,,,,
+16,600098,Mexico,,,,
+17,600113,Mexico,,,,
+18,600149,Mexico,,,,
+19,600228,Mexico,,,,
+20,600382,Mexico,,,,
+21,602532,Mexico,,,,
+22,603334,Mexico,,,,
+23,603539,Mexico,,,,
+24,690009,Mexico,,,,
+25,690053,Mexico,,,,
+26,690440,Mexico,,,,
+27,800001,Mexico,,,,
+28,800038,Mexico,,,,
+29,800040,Mexico,,,,
+30,800055,Mexico,,,,

@@ -1,5 +1,7 @@
-# Libraries and packages
-# dbem_Import function
+# Download libraries
+
+library(tidyverse)
+# dbem_import() function
 
 
 # get aggregate SAU catch by taxon (aka remove cell ID component)
@@ -42,10 +44,10 @@ alaska_cygwin <- read.csv("C:/Users/angmel/Documents/firstchapter/SAU x DBEM/tax
 # the rest of the cygwin folder have not been modelled
 
 # USA West Coast
-USA_West <- read.csv(file = "C:/Users/angmel/Documents/firstchapter/SAU x DBEM/USA (Pacific)")
+USA_West_catch <- read.csv(file = "C:/Users/angmel/Documents/firstchapter/SAU x DBEM/USA (Pacific)")
 USA_eez_cellID <- read.csv(file = "C:/Users/angmel/Documents/firstchapter/Reference tables/USA_eez_cellID.csv")
 colnames(USA_eez_cellID) <- c("eez", "INDEX")
-split_USA <- split(USA_West, USA_West$suggested_taxaID)
+split_USA <- split(USA_West_catch, USA_West_catch$suggested_taxaID)
 ?list2env
 list2env(split_USA, envir = .GlobalEnv)
 USA_taxa <- data.frame(unique(USA_West$suggested_taxaID))
@@ -53,44 +55,80 @@ USA_taxa <- USA_taxa[-158,]
 USA_taxa <- data.frame(USA_taxa)
 colnames(USA_taxa) <- "ID"
 write.csv(`USA_taxa`, file = "C:/Users/angmel/Documents/firstchapter/SAU x DBEM/taxaID/USA_taxaID")
+
+# upload taxa list
 USA_DROBO <- read.csv("C:/Users/angmel/Documents/firstchapter/SAU x DBEM/taxaID/USA_DROBO.csv", header = FALSE)
 USA_cygwin <- read.csv("C:/Users/angmel/Documents/firstchapter/SAU x DBEM/taxaID/USA_cygwin.csv", header = FALSE)
+
+# cell ID/EEZ table
+cellID <- read.csv(file = "C:/Users/angmel/Documents/firstchapter/Reference tables/eez_cellID.csv")
+colnames(cellID) <- c("eez", "INDEX")
+USA_West <- cellID %>% 
+  filter(eez == "848")
+
+# add taxa into global enviro
+USA_West_catch <- read.csv(file = "C:/Users/angmel/Documents/firstchapter/SAU x DBEM/USA (Pacific)")
+split_USA <- split(USA_West_catch, USA_West_catch$suggested_taxaID)
+list2env(split_USA, envir = .GlobalEnv)
+
 # the rest of the cygwin folder have not been modelled
 
 
 # Mexico
+
+# read Mexico SAU catch data
 Mexico <- read.csv(file = "C:/Users/angmel/Documents/firstchapter/SAU x DBEM/Mexico (Pacific)")
+
+# read Mexico cell ID table
 Mexico_eez_cellID <- read.csv(file = "C:/Users/angmel/Documents/firstchapter/Reference tables/Mexico_eez_cellID.csv")
+
+# rename Mexico cell ID table for join
 colnames(Mexico_eez_cellID) <- c("eez", "INDEX")
+
+# split each suggested taxa into its own data frame
 split_Mexico <- split(Mexico, Mexico$suggested_taxaID)
-?list2env
+
+# import suggested taxa tables into global environment
 list2env(split_Mexico, envir = .GlobalEnv)
-Mexico_taxa <- data.frame(unique(Mexico$suggested_taxaID))
+
+# import a list of taxa
+Mexico_taxa <- Mexico %>% 
+  select(suggested_taxaID) %>% 
+  unique() %>% 
+  data.frame()
+
+# rename column
 colnames(Mexico_taxa) <- "ID"
-write.csv(`Mexico_taxa`, file = "C:/Users/angmel/Documents/firstchapter/SAU x DBEM/taxaID/Mexico_taxaID")
+
+# save file
+# write.csv(`Mexico_taxa`, file = "C:/Users/angmel/Documents/firstchapter/SAU x DBEM/taxaID/Mexico_taxaID")
+
+# This step was done in Excel (take list of species from DROBO and cygwin, inner join)
 Mexico_DROBO <- read.csv("C:/Users/angmel/Documents/firstchapter/SAU x DBEM/taxaID/Mexico_DROBO.csv", header = FALSE)
 Mexico_cygwin <- read.csv("C:/Users/angmel/Documents/firstchapter/SAU x DBEM/taxaID/Mexico_cygwin.csv", header = FALSE)
-Mexicotaxa <- rbind(Mexico_cygwin, Mexico_DROBO)
-Mexicotaxa <- data.frame(Mexicotaxa)
-# the rest of the cygwin folder have not been modelled
 
 
 #************************************************************** ----
 
 # Canada ONLY
-for(i in 1:length(Canada_taxa$taxon.taxaID)){
-  taxontemp<-as.character(Canada_taxa$taxon.taxaID[i])
-  taxontemp<-substr(taxontemp,nchar(taxontemp)-5,nchar(taxontemp))
+# for(i in 1:length(Canada_taxa$taxon.taxaID)){
+#   taxontemp<-as.character(Canada_taxa$taxon.taxaID[i])
+#   taxontemp<-substr(taxontemp,nchar(taxontemp)-5,nchar(taxontemp))
 
-  
-# for(i in 1:length(Mexico_DROBO$V1)){
-#     taxontemp<-as.character(Mexico_DROBO$V1[i])
-#     # taxontemp<-substr(taxontemp,nchar(taxontemp)-5,nchar(taxontemp))
-#   
+# NOTES:
+# change country eez
+# change dbem_import() function's path to DROBO or cygwin!
+# change RCP scenario
+# change end file path
+
+for(i in 1:length(USA_DROBO$V1)){
+    taxontemp<-as.character(USA_DROBO$V1[i])
+    # taxontemp<-substr(taxontemp,nchar(taxontemp)-5,nchar(taxontemp))
+    # taxontemp<-as.character(800001)
   # extract DBEM data
   dbem <- dbem_Import(taxontemp, 1990, 2060, 2.6, "Catch")
-  dbem <- inner_join(dbem, Mexico_eez_cellID, by = "INDEX")
-  
+  dbem <- inner_join(dbem, USA_West, by = "INDEX")
+  unique(dbem$INDEX)
   # extract DBEM present day average distribution
   dbem_present <- dbem[1:22]
   
@@ -158,35 +196,36 @@ for(i in 1:length(Canada_taxa$taxon.taxaID)){
   sau_dbem <- full_join(dbem_present_prorated, dbem_future_prorated, by = "INDEX")
   sau_dbem[22] <- NULL
   
-  filepath<-paste("C:/Users/angmel/Documents/firstchapter/SAU_DBEM_RESULTS/Canada/GFDL26/",taxontemp,".csv",sep="")
+  filepath<-paste("C:/Users/angmel/Documents/firstchapter/SAU_DBEM_RESULTS/USA/GFDL26/",taxontemp,".csv",sep="")
   write.csv(sau_dbem,filepath,row.names=F)
+}
   
   #*******************************************
   
   
   
-  sau_dbem[is.na(sau_dbem)] <- 0
-  
-  # average 10 years
-  
-  avg_sau_dbem <- data.frame(t(array(1:52)))
-  colnames(avg_sau_dbem) <- c("INDEX", 2000:2050)
-  
-  for (j in 1:length(sau_dbem[,1])){
-    
-    # a <- 52 * length(sau_dbem[,1])
-    # avg_sau_dbem <- data.frame(matrix(seq(1:a), ncol = 52))
-    # avg_sau_dbem$X1 <- sau_dbem$INDEX 
-    # colnames(avg_sau_dbem) <- c("INDEX", 2000:2050)
-    
-    for (i in 2:52){
-      x <- i
-      y <- i + 19
-      avg_sau_dbem[j,i] <- rowMeans(sau_dbem[j,x:y])
-      
-      # avg_sau_dbem[j,i] <- rowone[j,i] 
-    }}
-  
-  avg_sau_dbem$INDEX <- sau_dbem$INDEX
-  
-}
+#   sau_dbem[is.na(sau_dbem)] <- 0
+#   
+#   # average 10 years
+#   
+#   avg_sau_dbem <- data.frame(t(array(1:52)))
+#   colnames(avg_sau_dbem) <- c("INDEX", 2000:2050)
+#   
+#   for (j in 1:length(sau_dbem[,1])){
+#     
+#     # a <- 52 * length(sau_dbem[,1])
+#     # avg_sau_dbem <- data.frame(matrix(seq(1:a), ncol = 52))
+#     # avg_sau_dbem$X1 <- sau_dbem$INDEX 
+#     # colnames(avg_sau_dbem) <- c("INDEX", 2000:2050)
+#     
+#     for (i in 2:52){
+#       x <- i
+#       y <- i + 19
+#       avg_sau_dbem[j,i] <- rowMeans(sau_dbem[j,x:y])
+#       
+#       # avg_sau_dbem[j,i] <- rowone[j,i] 
+#     }}
+#   
+#   avg_sau_dbem$INDEX <- sau_dbem$INDEX
+#   
+# }

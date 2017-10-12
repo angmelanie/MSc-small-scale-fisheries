@@ -20,14 +20,18 @@ inverts <- c("690088", "690206", "690053", "690088", "690440", "690009", "690053
 # upload csv file
 sppdist <- dbem_Import(600751, 1991,2060,2.6,"Catch")
 
+# upload lat, lon, INDEX
 lat_lon <- read.csv("C:/Users/angmel/Documents/firstchapter/Reference tables/Lat_Lon.csv", header = FALSE) %>% 
   rename("INDEX" = V1, "lon" = V2, "lat" = V3)
 
+# select relevant
 mapthis <- dplyr::select(sppdist, INDEX, X1991)
+
+# plot as a raster
 mapthis2 <- inner_join(mapthis, lat_lon, by = "INDEX")
 mapthis2$INDEX <- NULL
 mapthis2 <- mapthis2[,c(2,3,1)]
-
 xyz <- rasterFromXYZ(mapthis2)
 plot(xyz)
-?rasterFromXYZ
+
+

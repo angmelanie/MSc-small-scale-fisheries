@@ -61,27 +61,41 @@ library(zoo) #function rollMeans
 # RollMeans method
 ** Within zoo package, this calculates 20 year averages for 1 data frame **
 
+
+```{r}
+setwd("C:/Users/angmel/Documents/firstchapter/SAU_DBEM_RESULTS/Alaska/GFDL26/")
+```
+
 ```{r Rollmeans for 1 data frame}
 
- # prep upload data frame
-sau_dbem <- read.csv("C:/Users/angmel/Documents/firstchapter/SAU_DBEM_RESULTS/USA/GFDL85/603590.csv")
+path <- "C:/Users/angmel/Documents/firstchapter/SAU_DBEM_RESULTS/Alaska/GFDL26/"
 
-# remove rows with duplicated cell IDs -  error from 7final.R
-sau_dbem <- sau_dbem[!duplicated(sau_dbem$INDEX),]
+filename <- dir(path, pattern = ".csv")
+filepath <- paste("C:/Users/angmel/Documents/firstchapter/SAU_DBEM_RESULTS/Alaska/GFDL26/", filename, sep = "")
 
-# prepare data frame for analysis
-flip_sau_dbem <- data.frame(t(sau_dbem))
+for (i in 1:2){
+  sau_dbem <- read.csv(filepath[i], header = TRUE)
 
-# average every 20 years
-smoothMean <- rollmean(x = flip_sau_dbem, # original series 
-                       k = 20) # width of the rolling window 
-
-# tidying data
-colnames(smoothMean) <- flip_sau_dbem[1,]
-smoothMean <- smoothMean[-1,]
-rownames(smoothMean) <- c(2000:2051)
-# rownames(avg_sau_dbem) <- flip_sau_dbem[1,]
-
+  # remove rows with duplicated cell IDs -  error from 7final.R
+  sau_dbem <- sau_dbem[!duplicated(sau_dbem$INDEX),]
+  
+  # prepare data frame for analysis
+  flip_sau_dbem <- data.frame(t(sau_dbem))
+  
+  # average every 20 years
+  smoothMean <- rollmean(x = flip_sau_dbem, # original series 
+                         k = 20) # width of the rolling window 
+  # tidying data
+  colnames(smoothMean) <- flip_sau_dbem[1,]
+  smoothMean <- smoothMean[-1,]
+  rownames(smoothMean) <- c(2000:2051)
+  avg_sau_dbem <- data.frame(t(smoothMean))
+    
+  # final result
+  newfilepath <- paste("C:/Users/angmel/Documents/firstchapter/SAU_DBEM_RESULTS/Mexico/GFDL26/", filename[i], "_avg.csv", sep = "")
+    
+  write.csv(avg_sau_dbem, newfilepath)
+}
 # final result
 # avg_sau_dbem 
 ```
@@ -179,7 +193,15 @@ for(i in 1:length(Canada_taxa$taxon.taxaID)){
 ## Vicky's code
 
 ```{r}
-
+xx<-array(0,c(259200,1))
+  for(j in 1951:1970){
+    filepath<-paste("MPIMR85F1\\",spplist[i,2],"\\",spplist[i,2],"Catch",j,".txt",sep="")
+    xdata<-read.table(filepath)
+    x<-array(0,c(259200,1))
+    x[xdata[,1],1]<-xdata[,2]
+    xx<-xx+x
+  } # she keeps adding it to total... then divide it after to find average
+  xx<-xx/20
 ```
 
 
