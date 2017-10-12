@@ -171,7 +171,30 @@ test26 <- RCP26 %>%
   summarize(sum(year_total)) %>% 
   ggplot(aes(x=year, y = `sum(year_total)`)) +
   geom_point(aes(colour = DemersPelag)) +
-  theme_bw()
+  theme_bw() +
+  labs(title = "By DemersPelag - RCP 2.6: Projection of a sample of small-scale fisheries catches in PNA") +
+  theme(axis.text.x = element_text(angle = 90)) +
+  scale_x_discrete(breaks = c("2000", "2010", "2020", "2030", "2040", "2050"))
 
 ggsave("catch-by-demerpel-26.png", path = "C:/Users/angmel/Documents/firstchapter/SAU_DBEM_RESULTS/AGGREGATE/")
 
+
+##############################################################
+
+# Plot RCP 2.6 and 8.5 together
+
+RCP26$RCP <- "2.6"
+RCP85$RCP <- "8.5"
+dempel <- bind_rows(RCP85, RCP26)
+
+dempel %>% 
+  group_by(DemersPelag, year, RCP) %>% 
+  summarize(sum(year_total)) %>% 
+  ggplot(aes(x = year, y = `sum(year_total)`)) +
+           geom_point(aes(colour = DemersPelag, shape = RCP), size = 2) +
+  theme_bw()
+  labs(title = "By DemersPelag: Projection of a sample of small-scale fisheries catches in PNA") +
+  theme(axis.text.x = element_text(angle = 90)) +
+  scale_x_discrete(breaks = c("2000", "2010", "2020", "2030", "2040", "2050"))
+
+?aes

@@ -1,11 +1,7 @@
-# Question 1: 
+# Aggregate totals - RCP scenarios
 
-# What are the projected impacts on catches of small-scale fisheries within the region/EEZs?
-# AKA how does catch amount change in the future between Alaska, Canada, USA and Mexico?
-
-# Let's work within each EEZ - find total catch by year within each EEZ
-# change path for RCP scenarios and EEZ
-
+####################################################################
+# same method as implemented before
 # specify path, generate list of files to loop through
 path <- "C:/Users/angmel/Documents/firstchapter/SAU_DBEM_RESULTS/Alaska/GFDL26/avg/"
 filename <- dir(path)
@@ -17,21 +13,21 @@ datalist <- list()
 
 # loop through each .csv file in folder and sum by year
 for (i in 1:length(filepath)){
-
-# upload average years
-avg_catch <- read.csv(filepath[i])
-
-# rename columns, remove X
-colnames(avg_catch) <- c("cellID", 2000:2051)
-
-# this still maintains cellID info
-p <- avg_catch %>% 
-  gather(year, catch, -c(cellID), na.rm=TRUE) %>% 
-  dplyr::select(.,year, catch) %>% 
-  group_by(year) %>% 
-  summarize(year_total = sum(catch))
-
-datalist[[i]] <- p # attaches each csv file as a new list
+  
+  # upload average years
+  avg_catch <- read.csv(filepath[i])
+  
+  # rename columns, remove X
+  colnames(avg_catch) <- c("cellID", 2000:2051)
+  
+  # this still maintains cellID info
+  p <- avg_catch %>% 
+    gather(year, catch, -c(cellID), na.rm=TRUE) %>% 
+    dplyr::select(.,year, catch) %>% 
+    group_by(year) %>% 
+    summarize(year_total = sum(catch))
+  
+  datalist[[i]] <- p # attaches each csv file as a new list
 }
 
 # bind all the list together
@@ -119,9 +115,8 @@ plotme <- PNAcatch_long %>%
   theme_bw() +
   labs(title = "BY EEZ - Projection of a sample of small-scale fisheries catches in PNA") +
   theme(axis.text.x = element_text(angle = 90)) +
-  scale_y_continuous(labels = scales::comma) + #get rid of sci notation with scales::comma
   scale_x_discrete(breaks = c("2000", "2010", "2020", "2030", "2040", "2050"))
-  
+
 ggsave("catch-by-eez.png", path = "C:/Users/angmel/Documents/firstchapter/SAU_DBEM_RESULTS/AGGREGATE/")
 
 
@@ -133,3 +128,22 @@ EEZ_RCP85 <- Canada85 %>%
   gather(scenario, catch, -c(year)) %>% 
   ggplot(aes(x=year, y=catch)) +
   geom_point(aes(colour = scenario))
+
+#####################################################################
+# use size class code, modified for RCP
+
+RCP26_sizeclass_catch$RCP <- "2.6"
+RCP85_sizeclass_catch$RCP <- "8.5"
+sizeclass <- bind_rows(RCP85_sizeclass_catch, RCP26_sizeclass_catch)
+
+sizeclass %>% 
+  group_by(year, RCP) %>% 
+  summarize(sum(year_total)) %>% 
+  ggplot(aes(x = year, y = `sum(year_total)`)) +
+  geom_point(aes(colour = RCP), size = 2) +
+  theme_bw() + 
+  labs(title = "By RCP scenarios: Projection of a sample of small-scale fisheries catches in PNA") +
+  theme(axis.text.x = element_text(angle = 90)) +
+  scale_x_discrete(breaks = c("2000", "2010", "2020", "2030", "2040", "2050"))
+
+

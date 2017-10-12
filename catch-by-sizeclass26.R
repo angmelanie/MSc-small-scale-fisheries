@@ -200,4 +200,4 @@ labs(title = "By DemersPelag: Projection of a sample of small-scale fisheries ca
   theme(axis.text.x = element_text(angle = 90)) +
   scale_x_discrete(breaks = c("2000", "2010", "2020", "2030", "2040", "2050"))
 
-?aes
+

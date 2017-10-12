@@ -215,7 +215,11 @@ test85 <- RCP85 %>%
   summarize(sum(year_total)) %>% 
   ggplot(aes(x=year, y = `sum(year_total)`)) +
   geom_point(aes(colour = DemersPelag)) +
-  theme_bw()
+  theme_bw() +
+  labs(title = "By DemersPelag - RCP 8.5: Projection of a sample of small-scale fisheries catches in PNA") +
+  theme(axis.text.x = element_text(angle = 90)) +
+  scale_x_discrete(breaks = c("2000", "2010", "2020", "2030", "2040", "2050"))
+
 
 ggsave("catch-by-demerpel-85.png", path = "C:/Users/angmel/Documents/firstchapter/SAU_DBEM_RESULTS/AGGREGATE/")
 
