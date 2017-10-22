@@ -133,5 +133,9 @@ write_csv(canadalist, "canadalist") # CHECK AGAINST DROBO AND CYGWIN
 # if not, collect info and model
 # if exist, then no need!
 
+#################################### SAVE SPLIT CATCHES
+
+write.csv(sau_ssf_canada, file = "sau_ssf_ca_splitcatch.csv")
+write.csv(sau_lsf_canada3, file = "sau_lsf_ca_splitcatch.csv")
 
 

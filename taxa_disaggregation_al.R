@@ -79,10 +79,10 @@ sau_ssf_alaska <- sau_ssf_al_tmp1 %>%
 # eez <- "USA (Alaska, Subarctic)"
 # Notes <- "ROUND2"
 # Suggested <- c("Pleuronectes quadrituberculatus", "Parophrys vetulus", "Psettichthys melanostictus")
-suggested_taxaID <- as.numeric(c("604250", "604248", "604255"))
-additions <- data.frame(taxonID, eez, taxon_name, Notes, Suggested, suggested_taxaID)
-taxa_dis_al <- bind_rows(additions, taxa_dis_al) %>% 
-  arrange(taxon_name)
+# suggested_taxaID <- as.numeric(c("604250", "604248", "604255"))
+# additions <- data.frame(taxonID, eez, taxon_name, Notes, Suggested, suggested_taxaID)
+# taxa_dis_al <- bind_rows(additions, taxa_dis_al) %>% 
+#   arrange(taxon_name)
 
 alaska_lsf <- left_join(sau_lsf_al2, taxa_dis_al, by = "taxon_name")
 
@@ -103,4 +103,8 @@ alaskalist <- bind_rows(sau_ssf_alaska, sau_lsf_alaska) %>%
   dplyr::select(Suggested, suggested_taxaID) %>% 
   unique()
 
+#################################### SAVE SPLIT CATCHES
+
+write.csv(sau_ssf_alaska, file = "sau_ssf_al_splitcatch.csv")
+write.csv(sau_lsf_alaska, file = "sau_lsf_al_splitcatch.csv")
 
