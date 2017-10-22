@@ -38,7 +38,7 @@ sau_lsf_ca <- sau_PNA_lsf %>%
   summarize(catch_sum = sum(catch)) %>% 
   arrange(-catch_sum)
 # select the top 75%
-sau_lsf_ca[sau_lsf_ca$catch_sum > quantile(sau_lsf_ca$catch_sum, probs = 25/100),]
+sau_lsf_ca2 <- sau_lsf_ca[sau_lsf_ca$catch_sum > quantile(sau_lsf_ca$catch_sum, probs = 25/100),]
 
 # ALASKA
 sau_lsf_al <- sau_PNA_lsf %>% 
@@ -47,7 +47,7 @@ sau_lsf_al <- sau_PNA_lsf %>%
   summarize(catch_sum = sum(catch)) %>% 
   arrange(-catch_sum)
 # select the top 75%
-sau_lsf_al[sau_lsf_al$catch_sum > quantile(sau_lsf_al$catch_sum, probs = 25/100),]
+sau_lsf_al2 <- sau_lsf_al[sau_lsf_al$catch_sum > quantile(sau_lsf_al$catch_sum, probs = 25/100),]
 
 # USA
 sau_lsf_us <- sau_PNA_lsf %>% 
@@ -56,7 +56,7 @@ sau_lsf_us <- sau_PNA_lsf %>%
   summarize(catch_sum = sum(catch)) %>% 
   arrange(-catch_sum)
 # select the top 75%
-sau_lsf_us[sau_lsf_us$catch_sum > quantile(sau_lsf_us$catch_sum, probs = 25/100),]
+sau_lsf_us2 <- sau_lsf_us[sau_lsf_us$catch_sum > quantile(sau_lsf_us$catch_sum, probs = 25/100),]
 
 # Mexico
 sau_lsf_me <- sau_PNA_lsf %>% 
@@ -65,7 +65,9 @@ sau_lsf_me <- sau_PNA_lsf %>%
   summarize(catch_sum = sum(catch)) %>% 
   arrange(-catch_sum)
 # select the top 75%
-sau_lsf_me[sau_lsf_me$catch_sum > quantile(sau_lsf_me$catch_sum, probs = 25/100),]
+sau_lsf_me2 <- sau_lsf_me[sau_lsf_me$catch_sum > quantile(sau_lsf_me$catch_sum, probs = 25/100),]
+
+
 
 # SMALL-SCALE FISHERIES
 # From Canada EEZ
@@ -75,7 +77,7 @@ sau_ssf_ca <- sau_PNA_ssf %>%
   summarize(catch_sum = sum(catch)) %>% 
   arrange(-catch_sum)
 # select the top 75%
-sau_ssf_ca[sau_ssf_ca$catch_sum > quantile(sau_ssf_ca$catch_sum, probs = 25/100),]
+sau_ssf_ca2 <- sau_ssf_ca[sau_ssf_ca$catch_sum > quantile(sau_ssf_ca$catch_sum, probs = 25/100),]
 
 # ALASKA
 sau_ssf_al <- sau_PNA_ssf %>% 
@@ -96,11 +98,13 @@ sau_ssf_us <- sau_PNA_ssf %>%
 sau_ssf_us[sau_ssf_us$catch_sum > quantile(sau_ssf_us$catch_sum, probs = 25/100),]
 
 # Mexico
-sau_ssf_me <- sau_PNA_ssf %>% 
+sau_ssf_me_1 <- sau_PNA_ssf %>% 
   filter(eez == "Mexico (Pacific)") %>% 
   group_by(taxon_name) %>% 
   summarize(catch_sum = sum(catch)) %>% 
   arrange(-catch_sum)
+dim(sau_ssf_me_1)
+dim(sau_ssf_me)
 # select the top 75%
 sau_ssf_me[sau_ssf_me$catch_sum > quantile(sau_ssf_me$catch_sum, probs = 25/100),]
 
