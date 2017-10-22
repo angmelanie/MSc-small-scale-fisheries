@@ -6,7 +6,9 @@ library(sqldf)
 # THESE ARE THE TOP 75% CATCH OF CANADA
 # IN THIS FILE, I DISAGRREGATE HIGHER CLASSIFICATIONS TO TAXA LEVEL
 # ALSO, SPLIT CATCH AMOUNT INTO SPECIES LEVEL
-# RESULTS: split_ssf_ca - SAU catch 
+# RESULTS: 
+# View(sau_ssf_canada) - SAU SSF catch already split 
+# View(sau_lsf_canada3) - this contains LSF split catch
 
 # import taxonid table
 taxonID <- read_csv("C:/Users/angmel/Documents/firstchapter/Reference tables/taxonID.csv")
@@ -23,16 +25,19 @@ taxa_dis_ca <- taxa_dis %>%
 
 # SSF ----------------------------------------------------------------------- # NO CHANGES :)
 # YOU ACCOUNTED FOR ALL OF THESE THE FIRST TIME AROUND
-anti_join(sau_ssf_ca, taxa_dis_ca, by = "taxon_name") # perfect everything matches - DONE!
-split_ssf_ca <- left_join(sau_ssf_ca, taxa_dis_ca, by = "taxon_name") %>% 
-  select(eez, suggested_taxaID, Suggested, catch_sum)
+anti_join(sau_ssf_ca2, taxa_dis_ca, by = "taxon_name") # perfect everything matches - inverts!
+split_ssf_ca <- left_join(sau_ssf_ca2, taxa_dis_ca, by = "taxon_name") %>% 
+  dplyr::select(eez, suggested_taxaID, Suggested, catch_sum) %>% 
+  rename(taxon_name = Suggested)
+
+sau_ssf_canada <- left_join(split_ssf_ca, taxonID, by = "taxon_name")
 
 # LSF -----------------------------------------------------------------------
 dim(sau_lsf_ca) # 40 species in lsf
-aj_lsf_ca <- anti_join(sau_lsf_ca, taxa_dis_ca, by = "taxon_name")  # 29 taxa do not match
+aj_lsf_ca2 <- anti_join(sau_lsf_ca2, taxa_dis_ca, by = "taxon_name")  # 22 taxa do not match
 
 # split within excel based on DFO, EcoTrust
-write_csv(aj_lsf_ca, "aj_lsf_ca") 
+write_csv(aj_lsf_ca2, "aj_lsf_ca2") 
 
 # done split, import back csv
 aj_lsf_ca_split <- read_csv(file = "taxa_dis/aj_lsf_ca.csv") %>% 
@@ -84,30 +89,49 @@ sau_lsf_canada <- sau_lsf_tmp4 %>%
 # sau_lsf_canada[144,3] <- "Naucrates ductor"
 # sau_lsf_canada[145,3] <- "Selar crumenophthalmus"
 # sau_lsf_canada[124,3] <- "Thunnus alalunga"
+# sau_lsf_canada2[33,3] <- "Thunnus alalunga"
+# sau_lsf_canada2[32,3] <- "Sardinops sagax"
 
-# lsf_taxalist_unique[60,1] <- "Pandalus dispar"
-# lsf_taxalist_unique[61,1] <- "Pandalus jordani"
+
+# sau_lsf_canada2[130,3] <- "Pandalus dispar"
+# sau_lsf_canada2[131,3] <- "Pandalus jordani"
 
 sau_lsf_canada <- left_join(sau_lsf_canada, taxonID, by = "taxon_name")
-lsf_taxalist <- sau_lsf_canada$taxon_name
+sau_lsf_canada2 <- sau_lsf_canada[1:136,]
+sau_lsf_canada2 <- sau_lsf_canada2[,1:4]
+sau_lsf_canada3 <- left_join(sau_lsf_canada2, taxonID, by = "taxon_name")
+View(sau_lsf_canada3) # THIS CONTAINS LSF SPLIT AND TAXON ID
+
+
+########################################################################
+
+# FIND WHAT I NEED TO MODEL
+# UNIQUE CANADA LSF
+
+lsf_taxalist <- sau_lsf_canada3$taxon_name
 lsf_taxalist <- unique(lsf_taxalist) %>% 
   as.data.frame()
 colnames(lsf_taxalist) <- "taxon_name"
-lsf_taxalist_unique <- left_join(lsf_taxalist_unique, taxonID, by = "taxon_name")
+lsf_taxalist_unique <- left_join(lsf_taxalist, taxonID, by = "taxon_name")
 
-lsf_taxalist_unique$taxonID.x <- NULL
-lsf_taxalist_unique %>% 
-  arrange(taxonID.y)
-write_csv(lsf_taxalist_unique, "canada_lsf_taxalist")
+#SSF
+ssf_taxalist <- sau_ssf_canada$taxon_name
+ssf_taxalist <- unique(ssf_taxalist) %>% 
+  as.data.frame()
+colnames(ssf_taxalist) <- "taxon_name"
+ssf_taxalist_unique <- left_join(ssf_taxalist, taxonID, by = "taxon_name")
+
+# MERGE TO FIND UNIQUE TAXA
+
+canadalist <- bind_rows(lsf_taxalist_unique, ssf_taxalist_unique) %>% 
+  unique()
+
+write_csv(canadalist, "canadalist") # CHECK AGAINST DROBO AND CYGWIN
 
 ##################################################################################
-# TO DO
-# lsf_taxalist_unique
-# these are the species I need to model (matched and not match with taxa ID)
-# check if non-matches are because of error in names
-# if not, reassign NEW taxaID!
-# from here, remove duplicates within lsf - add to ssf
-# compile one master taxa list and check against DROBO
+# check with list if modelled before (DROBO and cygwin)
+# if not, collect info and model
+# if exist, then no need!
 
 
 
