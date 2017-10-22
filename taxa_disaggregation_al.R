@@ -1,5 +1,9 @@
 # TAXA DISAGGREGATION - ALASKA
 
+# RESULTS
+#SSF: View(sau_ssf_alaska)
+#LSF: View(sau_lsf_alaska)
+
 # THESE ARE THE TOP 75% CATCH BY COUNTRY AND DISAGRREGATE TO TAXA LEVEL
 # RESULTS - taxa_dis_al_2
 # output needs to be a file of species you need to model in Access
@@ -41,11 +45,11 @@ taxa_dis_al %>%
 # CHECKS 
 # SSF - everything matches, but error file
 # error species redistributed
-anti_join(sau_ssf_al, taxa_dis_al, by = "taxon_name") 
+anti_join(sau_ssf_al2, taxa_dis_al, by = "taxon_name") 
 
 # LSF 
-# yesss - only 3 dont match and they're species level
-anti_join(sau_lsf_al, taxa_dis_al, by = "taxon_name") 
+# all matches
+anti_join(sau_lsf_al2, taxa_dis_al, by = "taxon_name") 
 
 # Split ###########################################################################
 # SSF------------------------------------------------------------------------------
@@ -62,22 +66,25 @@ sau_ssf_al_tmp1 <- left_join(alaska_ssf, df_count, by = "taxon_name")
 
 # divide original catch by count to get split catch ----
 sau_ssf_al_tmp1$catch_split <- sau_ssf_al_tmp1$catch_sum/sau_ssf_al_tmp1$count
+sau_ssf_alaska <- sau_ssf_al_tmp1 %>% 
+  dplyr::select(Suggested, suggested_taxaID, catch_sum, eez, catch_split)
 
 
 # LSF ------------------------------------------------------------------------------
+# BELOW is no longer needed because 75% LSF means it all matches!
 # add the 3 LSF taxa that are species level to taxa_dis folder
 # taxon_name <- c("Alaska plaice", "English sole", "Pacific sand sole")
-taxonID <- as.numeric(c("604250", "604248", "604255"))
-taxon_name <- c("Pleuronectes quadrituberculatus", "Parophrys vetulus", "Psettichthys melanostictus")
-eez <- "USA (Alaska, Subarctic)"
-Notes <- "ROUND2"
-Suggested <- c("Pleuronectes quadrituberculatus", "Parophrys vetulus", "Psettichthys melanostictus")
+# taxonID <- as.numeric(c("604250", "604248", "604255"))
+# taxon_name <- c("Pleuronectes quadrituberculatus", "Parophrys vetulus", "Psettichthys melanostictus")
+# eez <- "USA (Alaska, Subarctic)"
+# Notes <- "ROUND2"
+# Suggested <- c("Pleuronectes quadrituberculatus", "Parophrys vetulus", "Psettichthys melanostictus")
 suggested_taxaID <- as.numeric(c("604250", "604248", "604255"))
 additions <- data.frame(taxonID, eez, taxon_name, Notes, Suggested, suggested_taxaID)
 taxa_dis_al <- bind_rows(additions, taxa_dis_al) %>% 
   arrange(taxon_name)
 
-alaska_lsf <- left_join(sau_lsf_al, taxa_dis_al, by = "taxon_name")
+alaska_lsf <- left_join(sau_lsf_al2, taxa_dis_al, by = "taxon_name")
 
 # split catch by disaggregation
 Names <- toString(names(taxa_dis_al["taxon_name"]))
@@ -86,16 +93,14 @@ sau_lsf_al_tmp1 <- left_join(alaska_lsf, df_count, by = "taxon_name")
 
 # divide original catch by count to get split catch ----
 sau_lsf_al_tmp1$catch_split <- sau_lsf_al_tmp1$catch_sum/sau_lsf_al_tmp1$count
-View(sau_lsf_al_tmp1)
+sau_lsf_alaska <- sau_lsf_al_tmp1 %>% 
+  dplyr::select(Suggested, suggested_taxaID, catch_split, eez)
+View(sau_lsf_alaska)
 
-################################### SPLIT CATCH RESULT:
-# LSF: sau_lsf_al_tmp1
-# SSF: sau_ssf_al_tmp1
-al_lsf <- unique(sau_lsf_al_tmp1$suggested_taxaID)
+################################### COMPILE LSF AND SSF, FIND UNIQUE TAXA
 
-# To DO:
-# all species should already have taxaID
-# you have to get a unique list from LSF and SSF
-# compare this to DROBO and cygwin
-# you might have no finfishes (only 3 additions which are direct matches so hopefully)
-# but INVERTS NEED TO BE MODELLED
+alaskalist <- bind_rows(sau_ssf_alaska, sau_lsf_alaska) %>% 
+  dplyr::select(Suggested, suggested_taxaID) %>% 
+  unique()
+
+
