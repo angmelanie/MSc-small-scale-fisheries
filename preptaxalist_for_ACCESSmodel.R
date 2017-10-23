@@ -42,14 +42,39 @@ sau_lsf_tmp3 <- sau_lsf_tmp2 %>%
 master_taxalist$ID <- NULL
 tmp2 <- master_taxalist %>% 
   arrange(taxonID)
-View(tmp2) # blanks need to be assigned ID and prob have to be modelled
+write.csv(tmp2, "tmp2") # assign taxaID
 
+unique_species <- read_csv("C:/Users/angmel/Documents/MSc-small-scale-fisheries/reference_tables/mel_assigned_taxa_updated.csv")  # THIS IS THE FINAL LIST OF UNIQUE SPECIES
+View(unique_species)
 # Import pre-modelled DROBO list
-
-# Compare - what is not modelled yet
+DROBO_list <- read_csv("C:/Users/angmel/Documents/MSc-small-scale-fisheries/reference_tables/DROBO_list.csv") %>% 
+  rename(taxonID = TaxonID)
+DROBO_list$DROBO <- "DROBO"
 
 # Import cygwin list
+CYGWIN_list <- read_csv("C:/Users/angmel/Documents/MSc-small-scale-fisheries/reference_tables/CYGWIN_list.csv") %>% 
+  rename(taxonID = TaxonID)
+CYGWIN_list$CYGWIN <- "CYGWIN"
 
 # Compare - what is not modelled yet
+compare_unique_species <- unique_species %>% 
+  left_join(DROBO_list) %>% 
+  left_join(CYGWIN_list)
+View(compare_unique_species)
+
+# merge DROBO and CYGWIN to find out what is missing
+compare_unique_species$DROBO[!is.na(compare_unique_species$CYGWIN)] <- compare_unique_species$CYGWIN[!is.na(compare_unique_species$CYGWIN)] 
+
+# tidy data
+
+compare_unique_species %>% 
+  rename(exist = DROBO)
+compare_unique_species$CYGWIN <- NULL
+compare_unique_species %>% 
+  arrange(DROBO) %>% 
+  write.csv("model_me")
 
 # Export this list into Access - this is what you work with
+
+# under exist column, the NAs are species you need to model
+# all 263 species...
