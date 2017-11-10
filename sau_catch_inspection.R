@@ -86,7 +86,7 @@ sau_ssf_al <- sau_PNA_ssf %>%
   summarize(catch_sum = sum(catch)) %>% 
   arrange(-catch_sum)
 # select the top 75%
-sau_ssf_al[sau_ssf_al$catch_sum > quantile(sau_ssf_al$catch_sum, probs = 25/100),]
+sau_ssf_al2 <- sau_ssf_al[sau_ssf_al$catch_sum > quantile(sau_ssf_al$catch_sum, probs = 25/100),]
 
 # USA
 sau_ssf_us <- sau_PNA_ssf %>% 
@@ -95,7 +95,7 @@ sau_ssf_us <- sau_PNA_ssf %>%
   summarize(catch_sum = sum(catch)) %>% 
   arrange(-catch_sum)
 # select the top 75%
-sau_ssf_us[sau_ssf_us$catch_sum > quantile(sau_ssf_us$catch_sum, probs = 25/100),]
+sau_ssf_us2 <- sau_ssf_us[sau_ssf_us$catch_sum > quantile(sau_ssf_us$catch_sum, probs = 25/100),]
 
 # Mexico
 sau_ssf_me_1 <- sau_PNA_ssf %>% 
@@ -106,7 +106,7 @@ sau_ssf_me_1 <- sau_PNA_ssf %>%
 dim(sau_ssf_me_1)
 dim(sau_ssf_me)
 # select the top 75%
-sau_ssf_me[sau_ssf_me$catch_sum > quantile(sau_ssf_me$catch_sum, probs = 25/100),]
+sau_ssf_me2 <- sau_ssf_me[sau_ssf_me$catch_sum > quantile(sau_ssf_me$catch_sum, probs = 25/100),]
 
 
 # EXTRAS ---------------------------------------------------------------
