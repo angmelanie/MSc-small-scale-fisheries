@@ -28,6 +28,9 @@
 # C:/cygwin64/home/angmel/Fortran/Results/GFDL85MAF1/
 # C:/cygwin64/home/angmel/Fortran/Results/GFDL26MAF1/
 
+# C:/cygwin64/home/angmel/Fortran/Results/GFDL85MAF1/westgrid/GFDL85MAF1/
+# C:/cygwin64/home/angmel/Fortran/Results/GFDL26MAF1/westgrid/GFDL26MAF1/
+
 
 # Load packages
 
@@ -59,13 +62,13 @@ errspp <- numeric()
 #length(alaska_lsf_DROBO$taxonID
 
 for(i in 1:length(alaska_lsf_DROBO$taxonID)){
-  taxontemp <-as.character(alaska_lsf_DROBO$taxonID[1])
+  taxontemp <-as.character(alaska_lsf_DROBO$taxonID[i])
   dbem <- dbem_Import(taxontemp, 1990, 2060, 2.6, "Catch") #RCP
   dbem <- inner_join(dbem, Alaska_eez_cellID, by = "INDEX")
   dbem <- dbem %>% 
     select(-eez)
   
-  if (sum(dbem[,-1], na.rm = TRUE) > 0) {
+  if (sum(dbem[1,], na.rm = TRUE) > 0) {
     
     # extract DBEM present day average distribution
     dbem_present <- dbem[1:22]
@@ -143,6 +146,8 @@ for(i in 1:length(alaska_lsf_DROBO$taxonID)){
 }
 
 Alaska26_DROBO <- errspp # CHANGE THIS FOR DROBO/CYGWIN
+Alaska26_DROBO <- data.frame(Alaska26_DROBO) # make data frame format for saving
+write_csv(Alaska26_DROBO, "C:/Users/angmel/Documents/MSc-small-scale-fisheries/SAU_DBEM_RESULTS/Alaska/GFDL26/errspp")
 
 # USA DROBO RCP 8.5
 # rerun for cygwin change taxa list
